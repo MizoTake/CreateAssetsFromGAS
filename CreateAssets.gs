@@ -1,27 +1,28 @@
 var targetName = 'Signboard'
-var path = 'Assets/sLowZoo/Data/MessageSection/'
+var path = 'Assets/Signboard.asset'
+var githubUrl = 'https://raw.githubusercontent.com/MizoTake/CreateAssetsFromGASUnitySample/master/'
 
+var sheet = SpreadsheetApp.openById('1KsmJTKSRGXMd1YdtJDLPzkp6xvDskaXRezc7pyq2WVQ').getSheetByName(targetName)
 var github = setupGitHub()
 
 function pushToGithub() {
-  updateStrings(targetName, localizablePath)
+  updateStrings(targetName, path)
   pushToGitHub(github)
 }
 
 function updateStrings(targetName, path) {
-  var sheet = SpreadsheetApp.openById('1KsmJTKSRGXMd1YdtJDLPzkp6xvDskaXRezc7pyq2WVQ').getSheetByName(targetName)
   var fileName = targetName + '.asset'
 
   var result = ""
-  var id = targetSheet.getRange(2, idIndex(targetSheet), targetSheet.getLastRow(), 1).getValues()
-  var names = targetSheet.getRange(2, nameIndex(targetSheet), targetSheet.getLastRow(), 1).getValues()
-  var message = targetSheet.getRange(2, messageIndex(targetSheet), targetSheet.getLastRow(), 1).getValues()
-  names.map(function(name, namesIndex) {
-    name.map(function(item, index) {
-      if (!(item == "" || typeof item === "undefined")) {
-        result += "  - id: " + id[namesIndex] + "\n"
-        result += "    name:\"" + item + "\"\n"
-        result += "    message: \"" + message[namesIndex] + "\"\n"
+  var idRange = sheet.getRange(2, index('id'), sheet.getLastRow(), 1).getValues()
+  var nameRange = sheet.getRange(2, index('name'), sheet.getLastRow(), 1).getValues()
+  var messageRange = sheet.getRange(2, index('message'), sheet.getLastRow(), 1).getValues()
+  idRange.map(function(id, idIndex) {
+    id.map(function(item, index) {
+      if (item != "" && typeof item !== undefined) {
+        result += "  - id: " + item + "\n"
+        result += "    name:\"" + nameRange[idIndex] + "\"\n"
+        result += "    message: \"" + messageRange[idIndex] + "\"\n"
       }
     });
   });
@@ -29,21 +30,10 @@ function updateStrings(targetName, path) {
   addCommitData(path + fileName, result, github)
 }
 
-function idIndex(targetSheet) {
-  var contentTitles = targetSheet.getRange(1, 1, 1, targetSheet.getLastColumn()).getValues()[0]
-  return contentTitles.indexOf('id') + 1
+function index(target) {
+  var contentTitles = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+  return contentTitles.indexOf(target) + 1
 }
-
-function nameIndex(targetSheet) {
-  var contentTitles = targetSheet.getRange(1, 1, 1, targetSheet.getLastColumn()).getValues()[0]
-  return contentTitles.indexOf('name') + 1
-}
-
-function messageIndex(targetSheet) {
-  var contentTitles = targetSheet.getRange(1, 1, 1, targetSheet.getLastColumn()).getValues()[0]
-  return contentTitles.indexOf('message') + 1
-}
-
 
 // add user property from code
 function setup() {

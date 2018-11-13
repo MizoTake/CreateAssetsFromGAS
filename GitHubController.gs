@@ -5,17 +5,23 @@ var branchName = 'feature/gas'
 function setupGitHub() {
   var prop = PropertiesService.getUserProperties()
   var option = { name:prop.getProperty('NAME') , email:prop.getProperty('EMAIL') }
-  return new GitHubAPI.GitHubAPI('MizoTake', 'sLowZoo', prop.getProperty('GITHUB_TOKEN'), option)
+  return new GitHubAPI.GitHubAPI('MizoTake', 'CreateAssetsFromGASUnitySample', prop.getProperty('GITHUB_TOKEN'), option)
 }
 
 function pushToGitHub(github) {
   const date = new Date()
-  createCommit(github)
-  createPullRequest(date, github)
+//  createCommit(github)
+//  createPullRequest(date, github)
 }
 
 function addCommitData(filePath, blobData, github) {
-  var blob = github.createBlob(blobData)
+  var txtBlob = UrlFetchApp.fetch(githubUrl + filePath)
+  var index = txtBlob.getContentText().lastIndexOf('flow:')
+  // flow: + 改行コード = 6
+  var deleteTarget = txtBlob.getContentText().slice(index + 6)
+  var header = txtBlob.getContentText().replace(deleteTarget, '')
+
+  var blob = github.createBlob(header + blobData)
   commitData.push({
       'path': filePath,
       'mode': '100644',
@@ -27,12 +33,7 @@ function addCommitData(filePath, blobData, github) {
 function createCommit(github) {  
   var branch = github.getBranch(branchName)
   var pTree = github.getTree(branch['commit']['commit']['tree']['sha'])
-  var origin = pTree['tree']
-  commitData.map(function(item, index) {
-    if (origin.indexOf(item) != -1) {
-      origin.splice(index, 1)
-    }
-  })
+  var origin = pTree['tree']  
   var data = {
     'tree': origin.concat(commitData)
   }
