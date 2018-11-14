@@ -21,7 +21,11 @@ function updateStrings(targetName, path) {
     id.map(function(item, index) {
       if (item != "" && typeof item !== undefined) {
         result += "  - id: " + item + "\n"
-        result += "    name:\"" + escape(nameRange[idIndex]).split('%').join('\\') + "\"\n"
+        var name = ''
+        if(nameRange[idIndex] != '') {
+          name = "\"" + escape(nameRange[idIndex]).split('%').join('\\') + "\""
+        } 
+        result += "    name: " + name + "\n"
         result += "    message: \"" + escape(messageRange[idIndex]).split('%').join('\\') + "\"\n"
       }
     });
