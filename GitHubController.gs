@@ -10,8 +10,8 @@ function setupGitHub() {
 
 function pushToGitHub(github) {
   const date = new Date()
-//  createCommit(github)
-//  createPullRequest(date, github)
+  createCommit(github)
+  createPullRequest(date, github)
 }
 
 function addCommitData(filePath, blobData, github) {
@@ -33,9 +33,9 @@ function addCommitData(filePath, blobData, github) {
 function createCommit(github) {  
   var branch = github.getBranch(branchName)
   var pTree = github.getTree(branch['commit']['commit']['tree']['sha'])
-  var origin = pTree['tree']  
   var data = {
-    'tree': origin.concat(commitData)
+    'base_tree': pTree['sha'],
+    'tree': commitData
   }
   var tree = github.createTree(data)
   var commit = github.createCommit('new GSS Data', tree['sha'], branch['commit']['sha'])
@@ -47,7 +47,7 @@ function createPullRequest(date, github) {
   try {
     const previousDay = new Date(date.getTime() + 24 * 60 * 60 * 1000)
     var title = Utilities.formatDate(previousDay, Session.getScriptTimeZone(), "yyyy/M/d")
-    return github.createPullRequest(title, branchName, 'develop')
+    return github.createPullRequest(title, branchName, 'master')
   } catch (error) {
     Logger.log(error)
   }

@@ -1,5 +1,5 @@
 var targetName = 'Signboard'
-var path = 'Assets/Signboard.asset'
+var path = 'Assets/'
 var githubUrl = 'https://raw.githubusercontent.com/MizoTake/CreateAssetsFromGASUnitySample/master/'
 
 var sheet = SpreadsheetApp.openById('1KsmJTKSRGXMd1YdtJDLPzkp6xvDskaXRezc7pyq2WVQ').getSheetByName(targetName)
@@ -21,8 +21,8 @@ function updateStrings(targetName, path) {
     id.map(function(item, index) {
       if (item != "" && typeof item !== undefined) {
         result += "  - id: " + item + "\n"
-        result += "    name:\"" + nameRange[idIndex] + "\"\n"
-        result += "    message: \"" + messageRange[idIndex] + "\"\n"
+        result += "    name:\"" + escape(nameRange[idIndex]).split('%').join('\\') + "\"\n"
+        result += "    message: \"" + escape(messageRange[idIndex]).split('%').join('\\') + "\"\n"
       }
     });
   });
